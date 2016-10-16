@@ -3,17 +3,16 @@ package nyc.c4q.rusili.simplecalculator;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
-public class Vertical extends AppCompatActivity {
+import nyc.c4q.rusili.simplecalculator.Calculations.Recursion;
 
-    private boolean lastequals = false;
-    private String op = "";
-    private String sNumber1, sNumber2, sAnswer;
+public class Main extends AppCompatActivity {
+
+    int terms = 0;
     private String sDisplay = "";
     private String sDisplay2 = "";
     private TextView tvMain, tvHistory;
@@ -28,12 +27,9 @@ public class Vertical extends AppCompatActivity {
         tvMain = (TextView) findViewById(R.id.displaynumbers);
     }
     public void ce() {
-        lastequals = false;
-        sNumber1 = sNumber2 = sAnswer = sDisplay = sDisplay2 = "";
+        sDisplay = sDisplay2 = "";
         tvMain.setText(sDisplay);
         tvHistory.setText(sDisplay2);
-        this.cantClickOP();
-        this.canClickEquals();
     }
 
     public void clear() {
@@ -65,8 +61,7 @@ public class Vertical extends AppCompatActivity {
         Button b = (Button)v;
         int i = Integer.parseInt(b.getText().toString());
         addValue(i);
-        this.canClickOP();
-        this.canClickEquals();
+        terms++;
     }
 
     public void onClickUtil(View v) {
@@ -85,69 +80,29 @@ public class Vertical extends AppCompatActivity {
                 this.ce();
                 break;
             case "=":
-                sNumber2 = sDisplay;
-                Log.d("sDisplay", sDisplay);
-                if (op.equals("/")) {
-                    sAnswer = Double.toString(Double.parseDouble(sNumber1) / Double.parseDouble(sNumber2));
-                } else if (op.equals("*")) {
-                    sAnswer = Double.toString(Double.parseDouble(sNumber1) * Double.parseDouble(sNumber2));
-                } else if (op.equals("-")) {
-                    sAnswer = Double.toString(Double.parseDouble(sNumber1) - Double.parseDouble(sNumber2));
-                } else if (op.equals("+")) {
-                    sAnswer = Double.toString(Double.parseDouble(sNumber1) + Double.parseDouble(sNumber2));
+                if (terms > 2) {
+                    this.calculate(tvMain.getText().toString());
+                    tvMain.setText(sDisplay);
+                    sDisplay2 += "=" + sDisplay;
+                    tvHistory.setText(sDisplay2);
                 }
-                // Converts double to int if answer ends in ".0"
-                if (Double.parseDouble(sAnswer) == Math.floor(Double.parseDouble(sAnswer))){
-                    sAnswer = Integer.toString((int) Double.parseDouble(sAnswer));
-                }
-
-                tvMain.setText(sAnswer);
-                if (lastequals) {
-                    sDisplay2 += " " + op + " " + sNumber2;
-                }
-                lastequals = true;
-                sNumber1 = sAnswer;
-                sDisplay2 += " = " + sAnswer;
-                tvHistory.setText(sDisplay2);
-
-                scroll.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
-                this.canClickOP();
-                break;
+                terms = 0;
         }
+    }
+
+    private void calculate(String sInput) {
+        Recursion rec = new Recursion();
+        sDisplay = rec.start(sInput).toString();
     }
 
     public void onClickOp(View v) {
         Button b = (Button)v;
-        String s = b.getText().toString();
+        char s = b.getText().charAt(0);
+        addValue(s);
+        terms++;
 
-        if (!lastequals) {
-            sNumber1 = sDisplay;
-        }
         tvHistory.setText(sDisplay2);
         scroll.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
-        lastequals = false;
-        clear();
-        switch (s){
-            case "+":
-                op = "+";
-                sDisplay2 += " + ";
-                break;
-            case "-":
-                op = "-";
-                sDisplay2 += " - ";
-                break;
-            case "*":
-                op = "*";
-                sDisplay2 += " * ";
-                break;
-            case "/":
-                op = "/";
-                sDisplay2 += " / ";
-                break;
-        }
-        this.cantClickOP();
-        this.cantClickEquals();;
-        tvHistory.setText(sDisplay2);
     }
 
     public void cantClickOP(){
@@ -172,7 +127,6 @@ public class Vertical extends AppCompatActivity {
         temp.setEnabled(false);
         temp.setTextColor(Color.parseColor("#767676"));
     }
-
     public void canClickOP(){
         Button temp = (Button) findViewById(R.id.buttonplus);
         temp.setClickable(true);
@@ -195,7 +149,6 @@ public class Vertical extends AppCompatActivity {
         temp.setEnabled(true);
         temp.setTextColor(Color.parseColor("#dcdcdc"));
     }
-
     public void cantClickEquals(){
         Button temp = (Button) findViewById(R.id.buttonequals);
         temp.setClickable(false);
@@ -203,7 +156,6 @@ public class Vertical extends AppCompatActivity {
         temp.setEnabled(false);
         temp.setTextColor(Color.parseColor("#767676"));
     }
-
     public void canClickEquals(){
         Button temp = (Button) findViewById(R.id.buttonequals);
         temp.setClickable(true);
