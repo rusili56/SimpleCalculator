@@ -7,16 +7,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import nyc.c4q.rusili.simplecalculator.Calculations.Recursion;
 
 public class Main extends AppCompatActivity {
 
+    // Fields:
     boolean leftParenth = false;
     int terms = 0;
     private String sDisplay = "";
-    private String sDisplay2 = "";
-    private TextView tvMain, tvHistory;
+    private String sHistory = "";
+    private TextView tvDisplay, tvHistory;
     private HorizontalScrollView scroll;
 
     @Override
@@ -25,46 +27,38 @@ public class Main extends AppCompatActivity {
         setContentView(R.layout.vertical);
         scroll = (HorizontalScrollView) findViewById(R.id.headerscroll);
         tvHistory = (TextView) findViewById(R.id.headerdisplay);
-        tvMain = (TextView) findViewById(R.id.displaynumbers);
-    }
-    public void ce() {
-        sDisplay = sDisplay2 = "";
-        tvMain.setText(sDisplay);
-        tvHistory.setText(sDisplay2);
+        tvDisplay = (TextView) findViewById(R.id.displaynumbers);
+        this.cantClickOP();
     }
 
-    public void clear() {
-        sDisplay = "";
-        tvMain.setText(sDisplay);
+    // Recursion calculation starts here:
+    private void calculate(String sInput) {
+        Recursion rec = new Recursion();
+        sDisplay = rec.start(sInput).toString();
     }
 
-    public void addValue(int input) {
-        sDisplay += Integer.toString(input);
-        tvMain.setText(sDisplay);
-        sDisplay2 += input;
-        tvHistory.setText(sDisplay2);
-    }
-
-    public void addValue(char input) {
-        sDisplay += input;
-        tvMain.setText(sDisplay);
-        sDisplay2 += input;
-        tvHistory.setText(sDisplay2);
-    }
-
-    public void del() {
-        sDisplay = sDisplay.substring(0, (sDisplay.length() - 1));
-        sDisplay2 = sDisplay2.substring(0, (sDisplay2.length() - 1));
-        tvMain.setText(sDisplay);
-        tvHistory.setText(sDisplay2);
-    }
+    // onClick for the numpad
     public void onClickNum(View v) {
         Button b = (Button)v;
         int i = Integer.parseInt(b.getText().toString());
         addValue(i);
+        this.canClickOP();
         terms++;
     }
 
+    // onClick for the 4 Operations.
+    public void onClickOp(View v) {
+        Button b = (Button)v;
+        char s = b.getText().charAt(0);
+        addValue(s);
+        this.cantClickOP();
+        terms++;
+
+        tvHistory.setText(sHistory);
+        scroll.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+    }
+
+    // onClick for the other buttons
     public void onClickUtil(View v) {
         Button b = (Button)v;
         String s = b.getText().toString();
@@ -89,31 +83,60 @@ public class Main extends AppCompatActivity {
                 this.ce();
                 break;
             case "=":
-                if (terms > 2) {
-                    this.calculate(tvMain.getText().toString());
-                    tvMain.setText(sDisplay);
-                    sDisplay2 += "=" + sDisplay;
-                    tvHistory.setText(sDisplay2);
+                if (terms > 2 && !leftParenth) {
+                    this.calculate(tvDisplay.getText().toString());
+                    tvDisplay.setText(sDisplay);
+                    sHistory += "=" + sDisplay;
+                    tvHistory.setText(sHistory);
+                    terms = 0;
+                } else {
+                    if (terms < 2){
+                        Toast toast = Toast.makeText(this, "Invalid expression", Toast.LENGTH_SHORT);
+                        toast.show();
+                    } else if (!leftParenth){
+                        Toast toast = Toast.makeText(this, "Open parenthesis", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                 }
-            terms = 0;
         }
     }
 
-    private void calculate(String sInput) {
-        Recursion rec = new Recursion();
-        sDisplay = rec.start(sInput).toString();
+    // Method to clear everything
+    public void ce() {
+        sDisplay = sHistory = "";
+        tvDisplay.setText(sDisplay);
+        tvHistory.setText(sHistory);
+        this.cantClickOP();
     }
 
-    public void onClickOp(View v) {
-        Button b = (Button)v;
-        char s = b.getText().charAt(0);
-        addValue(s);
-        terms++;
-
-        tvHistory.setText(sDisplay2);
-        scroll.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+    // Appends the input (int) to the String of the main display
+    public void addValue(int input) {
+        // Avoids 0 spam
+        if (sDisplay.length() > 0 || input != 0) {
+            sDisplay += Integer.toString(input);
+            tvDisplay.setText(sDisplay);
+            sHistory += input;
+            tvHistory.setText(sHistory);
+        }
     }
 
+    // Appends the input (char) to the String of the main display
+    public void addValue(char input) {
+        sDisplay += input;
+        tvDisplay.setText(sDisplay);
+        sHistory += input;
+        tvHistory.setText(sHistory);
+    }
+
+    // Deletes the last character of the main display
+    public void del() {
+        sDisplay = sDisplay.substring(0, (sDisplay.length() - 1));
+        sHistory = sHistory.substring(0, (sHistory.length() - 1));
+        tvDisplay.setText(sDisplay);
+        tvHistory.setText(sHistory);
+    }
+
+    // Methods to disable/enable certain buttons.
     public void cantClickOP(){
         Button temp = (Button) findViewById(R.id.buttonplus);
         temp.setClickable(false);
@@ -136,6 +159,7 @@ public class Main extends AppCompatActivity {
         temp.setEnabled(false);
         temp.setTextColor(Color.parseColor("#767676"));
     }
+
     public void canClickOP(){
         Button temp = (Button) findViewById(R.id.buttonplus);
         temp.setClickable(true);
@@ -158,19 +182,14 @@ public class Main extends AppCompatActivity {
         temp.setEnabled(true);
         temp.setTextColor(Color.parseColor("#dcdcdc"));
     }
-    public void cantClickEquals(){
-        Button temp = (Button) findViewById(R.id.buttonequals);
-        temp.setClickable(false);
-        temp.setFocusable(false);
-        temp.setEnabled(false);
-        temp.setTextColor(Color.parseColor("#767676"));
-    }
-    public void canClickEquals(){
-        Button temp = (Button) findViewById(R.id.buttonequals);
-        temp.setClickable(true);
-        temp.setFocusable(true);
-        temp.setEnabled(true);
-        temp.setTextColor(Color.parseColor("#76B3FF"));
+
+
+//--------------------------------------------------------------
+
+    // Method just to clear the main display. Not used atm.
+    public void clear() {
+        sDisplay = "";
+        tvDisplay.setText(sDisplay);
     }
 }
 

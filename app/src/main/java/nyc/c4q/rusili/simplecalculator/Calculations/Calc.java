@@ -5,22 +5,18 @@ package nyc.c4q.rusili.simplecalculator.Calculations;
  */
 public class Calc {
 
-    public static int ulate (int iInput, char cInput, StringBuilder sbInput2){
+    public static int ulate (int iInput, char cInput, StringBuilder sbInput){
         int answer = 0;
 
         switch (cInput){
             case '+':
-                answer = iInput + Integer.parseInt(sbInput2.toString());
-                break;
+                answer = iInput + Integer.parseInt(sbInput.toString()); break;
             case '-':
-                answer = iInput - Integer.parseInt(sbInput2.toString());
-                break;
+                answer = iInput - Integer.parseInt(sbInput.toString()); break;
             case '*':
-                answer = iInput * Integer.parseInt(sbInput2.toString());
-                break;
+                answer = iInput * Integer.parseInt(sbInput.toString()); break;
             case '/':
-                answer = iInput / Integer.parseInt(sbInput2.toString());
-                break;
+                answer = iInput / Integer.parseInt(sbInput.toString()); break;
         }
         return answer;
     }

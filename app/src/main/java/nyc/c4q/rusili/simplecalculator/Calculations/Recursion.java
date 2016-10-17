@@ -9,18 +9,29 @@ import nyc.c4q.rusili.simplecalculator.Calculations.Compare;
  * Created by rusili on 10/7/16.
  */
 public class Recursion {
-    Queue<Character> cQueue = new LinkedList<>();
-    StringBuilder answer2 = new StringBuilder();
-    int size = 0;
+
+    // Fields:
     boolean isParenth = false;
     boolean insideParenth = false;
+    int size = 0;
+    Queue<Character> cQueue = new LinkedList<>();
+    StringBuilder answer2 = new StringBuilder();
 
+    // Starts the recursion process:
     public StringBuilder start(String sInput) {
         this.toQueue(sInput);
-        StringBuilder answer = this.recursion(this.getNum(), this.getc());
+        StringBuilder answer = this.recursion(this.getNum(), this.getC());
         return answer;
     }
 
+    // Converts all main string into a queue:
+    public Queue<Character> toQueue(String sInput) {
+        for (int i = 0; i < sInput.length(); i++) cQueue.add(sInput.charAt(i));
+        size = cQueue.size();
+        return cQueue;
+    }
+
+    // Method to get the next number:
     public StringBuilder getNum() {
         StringBuilder num1 = new StringBuilder();
         Character op1 = 'a';
@@ -48,7 +59,8 @@ public class Recursion {
         return num1;
     }
 
-    public char getc() {
+    // Method to get the next operator:
+    public char getC() {
         char c = 'a';
         if (cQueue.size() > 0) {
             c = cQueue.remove();
@@ -60,6 +72,7 @@ public class Recursion {
         return c;
     }
 
+    // Main recursion method:
     public StringBuilder recursion(StringBuilder sbInput, char cInput) {
         int answer;
         answer = Integer.parseInt(sbInput.toString());
@@ -68,7 +81,7 @@ public class Recursion {
         op1 = cInput;
 
         num2 = this.getNum();
-        op2 = this.getc();
+        op2 = this.getC();
 
         if ((Compare.isHigher(op1, op2) == true || isParenth) && !insideParenth) {
             if (isParenth) insideParenth = true;
@@ -84,11 +97,5 @@ public class Recursion {
             if (cQueue.size() > 0) recursion(answer2, op2);
         }
         return answer2;
-    }
-
-    public Queue<Character> toQueue(String sInput) {
-        for (int i = 0; i < sInput.length(); i++) cQueue.add(sInput.charAt(i));
-        size = cQueue.size();
-        return cQueue;
     }
 }
