@@ -12,6 +12,7 @@ import nyc.c4q.rusili.simplecalculator.Calculations.Recursion;
 
 public class Main extends AppCompatActivity {
 
+    boolean leftParenth = false;
     int terms = 0;
     private String sDisplay = "";
     private String sDisplay2 = "";
@@ -68,10 +69,18 @@ public class Main extends AppCompatActivity {
         Button b = (Button)v;
         String s = b.getText().toString();
         switch (s){
-            case ".":
-                if (!sDisplay.contains(".")) {
-                    addValue('.');
+            case "( )":
+                if (leftParenth == false){
+                    addValue('(');
+                    leftParenth = true;
                 }
+                else {
+                    addValue(')');
+                    leftParenth = false;
+                }
+                break;
+            case ".":
+                if (!sDisplay.contains(".")) addValue('.');
                 break;
             case "DEL":
                 this.del();
@@ -86,7 +95,7 @@ public class Main extends AppCompatActivity {
                     sDisplay2 += "=" + sDisplay;
                     tvHistory.setText(sDisplay2);
                 }
-                terms = 0;
+            terms = 0;
         }
     }
 
