@@ -77,7 +77,13 @@ public class Main extends AppCompatActivity {
                 if (!sDisplay.contains(".")) addValue('.');
                 break;
             case "DEL":
-                this.del();
+                if(sHistory.length()>0 && sDisplay.length()>0) {
+                    this.del();
+                }
+                else{
+                    sHistory = "0";
+                    sDisplay = "0";
+                }
                 break;
             case "":
                 this.ce();
